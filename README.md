@@ -3,7 +3,7 @@ hibernate-and-jpa
 
 A HelloWorld exercise using, you guessed it, hibernate and jpa.  
 
-This is based heavily on the [hibernate-and-hsqldb](https://github.com/jankenstein/hibernate-and-hsqldb) project.
+This is based heavily on the [hibernate-and-hsqldb](https://github.com/jankenstein/hibernate-and-hsqldb) project and is taken from [Java Persistenct with Hibernate](http://www.amazon.com/gp/product/1932394885/tag=ericjank00-20)
 
 Steps to recreate
 =================
