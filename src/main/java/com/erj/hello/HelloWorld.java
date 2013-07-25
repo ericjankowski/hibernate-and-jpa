@@ -19,8 +19,9 @@ public class HelloWorld {
 		EntityTransaction tx = em.getTransaction();
 		tx.begin();
 		
-		Message message = new Message("JPA: Hello World");
+		Message message = new Message("Hello World, JPA to the max");
 		em.persist(message);
+		em.persist(new Message("this is a test"));
 		
 		tx.commit();
 		em.close();
