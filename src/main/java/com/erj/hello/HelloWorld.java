@@ -1,12 +1,11 @@
 package com.erj.hello;
 
-import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
-import com.erj.persistence.HibernateUtil;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Persistence;
 
 public class HelloWorld {
 	
@@ -14,54 +13,35 @@ public class HelloWorld {
 	
 	public static void main(String [] args){
 		
-		firstUnitOfWork();
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("helloworld");
 		
-		secondUnitOfWork();
+		EntityManager em = emf.createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		tx.begin();
 		
-		thirdUnitOfWork();
+		Message message = new Message("JPA: Hello World");
+		em.persist(message);
 		
-		HibernateUtil.shutdown();
-	}
-
-	private static void firstUnitOfWork() {
-		Session firstSession = HibernateUtil.getSessionFactory().openSession();
-		Transaction firstTransaction = firstSession.beginTransaction();
+		tx.commit();
+		em.close();
 		
-		Message message = new Message("JPA:  Hello, World!");
-		msgId = (Long)firstSession.save(message);
 		
-		firstTransaction.commit();
-		firstSession.close();
-	}
-
-	@SuppressWarnings("rawtypes")
-	private static void secondUnitOfWork() {
-		Session secondSession = HibernateUtil.getSessionFactory().openSession();
-		Transaction secondTransaction = secondSession.beginTransaction();
 		
-		List messages = secondSession.createQuery("from Message m order by m.text asc").list();
+		EntityManager secondEm = emf.createEntityManager();
+		EntityTransaction secondTx = secondEm.getTransaction();
+		secondTx.begin();
 		
-		System.out.println(messages.size() + " message(s) were found:");
+		List<?> messages = secondEm.createQuery("select m from Message m order by m.text asc").getResultList();
 		
-		for(Iterator iter = messages.iterator(); iter.hasNext();){
-			Message loadedMsg = (Message) iter.next();
+		System.out.println(messages.size() + " message(s) found");
+		
+		for (Object m : messages){
+			Message loadedMsg = (Message) m;
 			System.out.println(loadedMsg.getText());
 		}
+		secondTx.commit();
+		secondEm.close();
 		
-		secondTransaction.commit();
-		secondSession.close();
-	}
-
-	private static void thirdUnitOfWork() {
-		Message message;
-		Session thirdSession = HibernateUtil.getSessionFactory().openSession();
-		Transaction thirdTransaction = thirdSession.beginTransaction();
-		
-		message = (Message) thirdSession.get(Message.class, msgId);
-		message.setText("JPA:  Greetings, Earthling.");
-		message.setNextMessage(new Message("JPA:  Take me to your leader."));
-		
-		thirdTransaction.commit();
-		thirdSession.close();
+		emf.close();
 	}
 }
